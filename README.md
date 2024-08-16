@@ -1,3 +1,12 @@
+# My github pages project
+
+Dev:
+- npm run dev
+
+Deploy:
+- npm run build
+- npm run deploy
+
 # Svelte + TS + Vite
 
 This template should help get you started developing with Svelte and TypeScript in Vite.
