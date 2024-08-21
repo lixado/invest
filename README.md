@@ -7,6 +7,15 @@ Deploy:
 - npm run build
 - npm run deploy
 
+# Notes
+## Picker
+https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.ts
+
+## TODO
+- finish circle chooser and move it as a component
+- make background based on mouse position & mandelbrot set
+
+
 # Svelte + TS + Vite
 
 This template should help get you started developing with Svelte and TypeScript in Vite.
