@@ -4,38 +4,37 @@
     const c = [-1, 0]
     const R = (1 + Math.sqrt(1+4*abs(c))) / 2; // escape radius choose R > 0 such that R**n - R >= sqrt(cx**2 + cy**2)
 
-    function conversion(x, y, width){   // transformation from canvas coordinates to XY plane
-        var m = R / width;
-        var x1 = m * (2 * x - width);
-        var y2 = m * (width - 2 * y);
-        return [x1, y2];
-    }
-
-    function f(z, c){  // calculate the value of the function with complex arguments.
-        return [z[0]*z[0] - z[1] * z[1] + c[0], 2 * z[0] * z[1] + c[1]];
-    }
-
     function abs(z){  // absolute value of a complex number
         return Math.sqrt(z[0]*z[0] + z[1]*z[1]);
     }
 
-    function julia(x_norm: number, y_norm: number): number {
-        /* returns
-         */
-        //const randomNumber = Math.round(Math.random());
-        //return randomNumber;
-        
-        // (scale to be between -R and R)
+    function julia(x: number, y: number, width: number, height: number): number {
+        /* returns a number [0, max_iterations] */
+
+        let m = R / width;
+        let x1 = m * (2 * x - width);
+        let y2 = m * (height - 2 * y);
+
+        let z =  [x1, y2];
+
+        let i = 0;
+        while (i < max_iterations) 
+        {
+            z = [z[0]*z[0] - z[1] * z[1] + c[0], 2 * z[0] * z[1] + c[1]];
+            if (abs(z) > R) return 0;
+
+            i += 1;
+        }
 
         return i;
     }
 
     function draw(event: Event) {
+        console.clear();
         let canvas = document.getElementById("canvas");
         let ctx = canvas.getContext("2d");
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
         console.log(ctx);
         //console.log(R**n - R >= Math.sqrt(cx**2 + cy**2)); // this must be true see up
         console.log(event.clientX)
@@ -47,21 +46,13 @@
 
         for (let x = 0; x <= canvas.width; x++) {
             for (let y = 0; y <= canvas.height; y++) {
-                let z = conversion(x, y, canvas.width);
-                let flag = true;
-                for (var i = 0; i < max_iterations; i++){ // I know I can change it to while and remove this flag.
-                    z = f(z, c);
-                    if (abs(z) > R){  // if during every one of the iterations we have value bigger then R, do not draw this point.
-                        flag = false;
-                        break;
-                    }
-                }
-                //const result = julia(x/canvas.width, y/canvas.height);
+                let iter_nr = julia(x, y, canvas.width, canvas.height);
 
                 //const blueIntensity = Math.round((result / max_iterations) * 255);
-                if(flag)
+                if(iter_nr > 0)
                 {
-                    ctx.fillStyle = `rgb(0, 0, 125)`;
+                    const blueIntensity = Math.round((iter_nr / max_iterations) * (255*(1/3)));
+                    ctx.fillStyle = `rgb(0, 0, ${blueIntensity})`;
                     ctx.fillRect(x, y, 1, 1);
                 }
             }
