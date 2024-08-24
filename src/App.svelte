@@ -2,7 +2,8 @@
   import svelteLogo from "./assets/svelte.svg";
     import CircleChooser from "./components/CircleChooser.svelte";
   import Curriculum from "./components/Curriculum.svelte";
-    import Mandelbrot from "./components/Mandelbrot.svelte";
+    import JuliaSet from "./components/JuliaSet.svelte";
+    import Mandelbrot from "./components/JuliaSet.svelte";
   import viteLogo from "/vite.svg";
 
   /*   let count = 0;
@@ -47,9 +48,9 @@
   </p> -->
 
 <main>
-  <Mandelbrot>
+  <JuliaSet>
 
-  </Mandelbrot>
+  </JuliaSet>
 </main>
 
 <style>
