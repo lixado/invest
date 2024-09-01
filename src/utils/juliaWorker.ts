@@ -13,7 +13,12 @@ self.onmessage = (e) => {
     const scaleIntensity = iterations / max_iterations;
     const rgb = getColorFromPalette(scaleIntensity);
 
-    const coloring = (
+    const coloring = rgb[0] === 0 && rgb[1] === 0 && rgb[2] === 0 ? ( // insted of black, make it background color
+      (255 << 24) |    // alpha
+        (36 << 16) | // blue
+        (36 << 8) |  // green
+        36           // red
+    ) : (
         (255 << 24) |    // alpha
         (rgb[2] << 16) | // blue
         (rgb[1] << 8) |  // green

@@ -1,58 +1,59 @@
 <script lang="ts">
-  import svelteLogo from "./assets/svelte.svg";
-    import CircleChooser from "./components/CircleChooser.svelte";
+  import CircleChooser from "./components/CircleChooser.svelte";
   import Curriculum from "./components/Curriculum.svelte";
-    import JuliaSet from "./components/JuliaSet.svelte";
-    import Mandelbrot from "./components/JuliaSet.svelte";
-  import viteLogo from "/vite.svg";
+  import FundVsBankCalculator from "./components/FundVsBankCalculator.svelte";
+  import JuliaSet from "./components/JuliaSet.svelte";
 
-  /*   let count = 0;
-  
-  function increment() {
-    count += 1;
-  } */
-  function handleClick(){
-    console.log("T");
+
+  let id = 0;
+
+  function handleClick(x: number){
+    id = x;
   }
- 
+
+  let juliaSetComponent: JuliaSet;
 </script>
 
-  <!--   <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
+
+<main on:mousemove={(e) => juliaSetComponent != null ? juliaSetComponent.draw(e) : null}>
+  <div class="centerButtons">
+    <button on:click={() => handleClick(1)}>
+      Julia Set
+    </button>
+    <button on:click={() => handleClick(2)}>
+      CV
+    </button>
+    <button on:click={() => handleClick(3)}>
+      Fund VS Bank calculator
+    </button>
   </div>
 
-  {#if count < 10}
-    <h1>My website!!!</h1>
+  {#if id == 1}
+    <br>
+    <div class="fullscreen">
+      <JuliaSet bind:this={juliaSetComponent}/>
+    </div>
   {/if}
-  {#if count > 9}
-    <Curriculum></Curriculum>
+  {#if id == 2}
+    <br>
+    <Curriculum />
   {/if}
-
-  <button on:click={increment}>
-    Clicked {count}
-    {count === 1 ? 'time' : 'times'}
-  </button>
-  
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank" rel="noreferrer">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p> -->
-
-<main>
-  <JuliaSet>
-
-  </JuliaSet>
+  {#if id == 3}
+    <br>
+    <FundVsBankCalculator />
+  {/if}
 </main>
 
 <style>
+  .centerButtons{
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;     /* Center vertically */
+    gap: 0.5em;
+  }
 
+  .fullscreen{
+    width: 80vw;
+    height: 80vh;
+  }
 </style>

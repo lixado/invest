@@ -19,7 +19,7 @@
     let workers: Worker[] = [];
     const numWorkers = navigator.hardwareConcurrency || 4;
 
-    function draw(event: MouseEvent) {
+    export function draw(event: MouseEvent) {
         if (currentMouseEvent < mouseEventsSkip) {
             currentMouseEvent += 1;
             return;
@@ -27,11 +27,16 @@
             currentMouseEvent = 0;
         }
 
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        console.log(event);
 
-        let mousePosX = map(event.clientX / width, cMin[0], cMax[0]);
-        let mousePosY = map(event.clientY / height, cMin[1], cMax[1]);
+        const width = context.canvas.width;
+        const height = context.canvas.height;
+
+        const windowWidth = window.outerWidth;
+        const windowHeight = window.outerHeight;
+
+        let mousePosX = map(event.clientX / windowWidth, cMin[0], cMax[0]);
+        let mousePosY = map(event.clientY / windowHeight, cMin[1], cMax[1]);
 
         c = [mousePosX, mousePosY];
 
@@ -86,16 +91,17 @@
 
         draw(new MouseEvent("click")); // Initial draw
     });
+    
 </script>
 
 <main>
-    <canvas class="fillViewPort" id="canvas" on:mousemove={draw}></canvas>
+    <canvas id="canvas"></canvas>
 </main>
 
 <style>
-    .fillViewPort {
+    canvas{
         display: flex;
-        place-items: center;
-        justify-items: flex-start;
+        width: 100%;
+        height: 100%;
     }
 </style>

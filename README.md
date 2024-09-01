@@ -15,3 +15,8 @@ https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.t
 - finish circle chooser and move it as a component
 - make background based on mouse position & mandelbrot set
 - https://medium.com/@nomanfareed681/parallel-processing-in-javascript-with-concurrency-c214e9facefd
+- make juliaFunctions/Worker.ts only load on JuliaSet load
+- Julia set mouse and performance improvements
+- center the VS
+- preload icons
+- mobile friendly
