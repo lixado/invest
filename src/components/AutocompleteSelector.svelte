@@ -28,32 +28,6 @@
         dispatch("select", { option: option });
     }
 
-    const possiblePaths = [
-        '/favicon.ico',
-        '/favicon.png',
-        '/web/images/favicon.png',
-        '/assets/favicon.ico',
-        '/assets/images/favicon.ico',
-    ];
-
-    function getNextIconUrl(currentUrl: string): string {
-        /* function to get next possible icon url if current url is not valid */
-        const url = new URL(currentUrl);
-
-        const currentPath = url.pathname;
-        if (!currentPath) {
-            return "";
-        };
-
-        const index = possiblePaths.indexOf(currentPath);
-        if (index !== -1 && index < possiblePaths.length - 1) 
-        {
-            let nextPath = url.origin + possiblePaths[index + 1];
-            return nextPath;
-        }
-        return "";
-    }
-
 </script>
 
 
@@ -80,7 +54,7 @@
                     on:keydown={(event) => event.key === 'Enter' && handleSelect(event, option)}
                     style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                         {#if option.icon_url}
-                            <img on:error={(e) => {option.icon_url != "" ? option.icon_url = getNextIconUrl(option.icon_url) : null}} src={option.icon_url} alt={option.name} style="width: 20px; height: 20px;" />
+                            <img on:error={(e) => {null}} src={option.icon_url} alt={option.name} style="width: 20px; height: 20px;" />
                         {/if}
                         {option.name}
                     </button>
@@ -92,7 +66,7 @@
                     on:keydown={(event) => event.key === 'Enter' && handleSelect(event, option)}
                     style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                         {#if option.icon_url}
-                            <img on:error={(e) => {option.icon_url != "" ? option.icon_url = getNextIconUrl(option.icon_url) : null}} src={option.icon_url} alt={option.name} style="width: 20px; height: 20px;" />
+                            <img on:error={(e) => {option.icon_url = ""}} src={option.icon_url} alt={option.name} style="width: 20px; height: 20px;" />
                         {/if}
                         {option.name}
                     </button>

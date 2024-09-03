@@ -79,6 +79,7 @@ interface Bank {
     publiserTil: string;
     leverandorId: string;
     leverandorUrl: string;
+    icon_url: string;
     leverandorHref: string;
     leverandorVisningsnavn: string;
     markedsomraade: string;

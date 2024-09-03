@@ -20,3 +20,7 @@ https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.t
 - center the VS
 - preload icons
 - mobile friendly
+- auto fix icon url at mount or in the json
+- fix
+"rentesats1": "0",
+"rentesats2": "4.35",
