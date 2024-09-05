@@ -72,9 +72,10 @@
 
     onMount(async () => {
         try {
-            // Read JSON from funds.json
             // get current url
             const currentUrl = window.location.href;
+
+            // Read JSON from funds.json
             const fundsResponse = await fetch(currentUrl + '/funds.json');
             fundsData = await fundsResponse.json();
 
@@ -172,18 +173,18 @@
                         <th>Date</th>
                         {#each funds as fund}
                             <th>
-                                <div style="display: flex; align-items: center; gap: 5px;">
+                                <div title={fund.instrument_info.name} style="display: flex; align-items: center; gap: 5px;">
                                     <img src={fund.instrument_info.instrument_icon_url} alt={fund.instrument_info.name} style="width: 20px; height: 20px;" />
-                                    {fund.instrument_info.name}
+                                    {fund.instrument_info.name.length > 10 ? fund.instrument_info.name.slice(0, 10) + '...' : fund.instrument_info.name}
                                 </div>
                             </th>
                         {/each}
                         <th>VS</th>
                         {#each banks as bank}
                             <th>
-                                <div style="display: flex; align-items: center; gap: 5px;">
+                                <div title={bank.leverandorVisningsnavn} style="display: flex; align-items: center; gap: 5px;">
                                     <img src={bank.icon_url} alt={bank.leverandorVisningsnavn} style="width: 20px; height: 20px;" />
-                                    {bank.leverandorVisningsnavn}
+                                    {bank.leverandorVisningsnavn.length > 10 ? bank.leverandorVisningsnavn.slice(0, 10) + '...' : bank.leverandorVisningsnavn}
                                 </div>
                             </th>
                         {/each}
