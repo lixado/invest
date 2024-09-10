@@ -21,6 +21,6 @@ https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.t
 - preload icons
 - mobile friendly
 - auto fix icon url at mount or in the json
-- fix
+- fix white mode
 "rentesats1": "0",
 "rentesats2": "4.35",

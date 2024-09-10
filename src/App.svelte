@@ -40,8 +40,9 @@
   {/if}
   {#if id == 3}
     <br>
-    <FundVsBankCalculator />
   {/if}
+
+  <FundVsBankCalculator />
 </main>
 
 <style>

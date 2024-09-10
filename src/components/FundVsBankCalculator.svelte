@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import type { FundResult, Bank, AutocompleteOption } from '../utils/models';
     import AutocompleteSelector from './AutocompleteSelector.svelte';
+    import { Chart , LineController, LineElement, PointElement, LinearScale, CategoryScale } from 'chart.js/auto';
 
     var fundsData: FundResult[];
     var banksData: Bank[];
@@ -70,6 +71,44 @@
         return calculateBank(bank, months-1) * (1 + (Number(bank.rentesats1)/100)) + getMonthlyContributionValue();
     }
 
+    function plotGraph() {
+        const labels = Array.from({length: futureMonths}, (_, i) => {
+            const date = new Date();
+            date.setMonth(date.getMonth() + i);
+            return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+        });
+
+        const fundDatasets = funds.map((fund) => {
+            return {
+                label: fund.instrument_info.name,
+                data: Array.from({length: futureMonths}, (_, i) => calculateFund(fund, i)),
+                fill: false,
+                tension: 0.1
+            }
+        });
+
+        const bankDatasets = banks.map((bank) => {
+            return {
+                label: bank.leverandorVisningsnavn,
+                data: Array.from({length: futureMonths}, (_, i) => calculateBank(bank, i)),
+                fill: false,
+                tension: 0.1
+            }
+        });
+
+        new Chart(
+            document.getElementById('chart') as HTMLCanvasElement,
+            {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [...fundDatasets, ...bankDatasets]
+                }
+            }
+        );
+
+    }
+
     onMount(async () => {
         try {
             // get current url
@@ -86,6 +125,8 @@
             // for testing purposes fill in with 3 funds and 3 banks
             funds = fundsData.sort(() => 0.5 - Math.random()).slice(0, 2);
             banks = banksData.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+            plotGraph();
         } catch (error) {
             console.error('Error fetching stock price data:', error);
         }
@@ -164,6 +205,8 @@
         </div>
     </div>
 
+    <canvas id="chart"></canvas>
+
     {#if funds.length > 0 && banks.length > 0}
         <div style="display: flex; flex-direction: column; gap: 0.5em; width: 100%;">
             <h1 style="text-align: center;">Comparison</h1>
@@ -214,39 +257,4 @@
 </main>
 
 <style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 1rem 0;
-        font-size: 1rem;
-        text-align: left;
-        background-color: #2c2c2c;
-        color: #fff;
-    }
-
-    th, td {
-        padding: 0.75rem;
-        border: 1px solid #444;
-    }
-
-    th {
-        background-color: #444;
-        font-weight: bold;
-    }
-
-    tr:nth-child(even) {
-        background-color: #3a3a3a;
-    }
-
-    tr:hover {
-        background-color: #555;
-    }
-
-    thead {
-        background-color: #555;
-    }
-
-    tbody tr:hover {
-        background-color: #666;
-    }
 </style>
