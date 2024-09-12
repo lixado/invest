@@ -24,3 +24,19 @@ https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.t
 - fix white mode
 "rentesats1": "0",
 "rentesats2": "4.35",
+- use colors from icon if possible!!
+
+- automate scripts to update data from :!!!!!!!!!!!!!!! and add to publish
+- banks
+- funds
+- tax rates https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/aksjer-og-verdipapirer/om/aksjesparekonto-ask/
+
+- on mouse over show cards!!!!
+- header on table freeze infinite scroll
+- make graph easy to zoom
+- show risik
+
+- use colors based on icon!
+
+- show profit in table
+hraph on zoom increase/decrease months

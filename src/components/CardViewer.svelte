@@ -1,0 +1,41 @@
+<script lang="ts">
+import type { FundResult, Bank } from '../utils/models';
+
+export let fund: FundResult | null = null;
+export let bank: Bank | null = null;
+
+$: cardData = fund 
+    ? {
+        name: fund.instrument_info.name,
+        iconUrl: fund.instrument_info.instrument_icon_url,
+        rate: fund.historical_returns_info.yield_1y?.toFixed(2) ?? 'N/A',
+        fee: fund.fund_info.fund_calculated_fee?.toFixed(2) ?? 'N/A',
+        url: `https://www.nordnet.no/market/funds?sortField=yield_1y&sortOrder=descending&freeTextSearch=${fund.instrument_info.name}`
+    }
+    : bank
+    ? {
+        name: bank.leverandorVisningsnavn + ` (${bank.navn})`,
+        iconUrl: bank.leverandorUrl.endsWith('/') ? bank.leverandorUrl + 'favicon.ico' : bank.leverandorUrl + '/favicon.ico',
+        rate: Number(bank.rentesats1)?.toFixed(2) ?? 'N/A',
+        fee: 'N/A',
+        url: bank.leverandorUrl
+    }
+    : null;
+
+</script>
+
+
+<main>
+    {#if cardData}
+        <div class="mat-card">
+            <img src={cardData.iconUrl} alt={cardData.name} style="width: 50px; height: 50px;" />
+            <h3><a href={cardData.url} target="_blank">{cardData.name}</a></h3>
+            <p>Calculated Fee: {cardData.fee} %</p>
+            <p>Last 1 Year Increase: {cardData.rate}%</p>
+        </div>
+    {/if}
+</main>
+
+<style>
+
+</style>

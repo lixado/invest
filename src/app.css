@@ -41,13 +41,13 @@ h1 {
 
 #app {
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0 2rem 2rem 2rem;
   text-align: center;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  /* border-collapse: collapse; */
   margin: 1rem 0;
   font-size: 1rem;
   text-align: left;
