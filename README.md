@@ -40,3 +40,15 @@ https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.t
 
 - show profit in table
 hraph on zoom increase/decrease months
+- recalculate on change values
+- rename website maybe
+- edit assumtive values see twiter tingy
+
+
+.vscode
+
+
+add IPS konto
+fix mobile view
+make graph reactive should be 1 line
+dont reset (graph filter) when adding fund on graph
