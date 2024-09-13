@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["unplugin-icons/types/svelte"], 
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "skipLibCheck": true,

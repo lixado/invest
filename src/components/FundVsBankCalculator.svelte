@@ -1,29 +1,33 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { Chart , LineController, LineElement, PointElement, LinearScale, CategoryScale } from 'chart.js/auto';
+    import zoomPlugin from 'chartjs-plugin-zoom';
+    import AddIcon from 'virtual:icons/material-symbols/add';
+
     import type { FundResult, Bank, AutocompleteOption } from '../utils/models';
     import AutocompleteSelector from './AutocompleteSelector.svelte';
-    import { Chart , LineController, LineElement, PointElement, LinearScale, CategoryScale } from 'chart.js/auto';
     import CardViewer from './CardViewer.svelte';
+    import { formatNumber } from '../utils/utils';
 
-    var fundsData: FundResult[];
-    var banksData: Bank[];
+    Chart.register(zoomPlugin);
 
     var startAmount = formatNumber("10000");
-    function getStartAmountValue(): number {
-        return Number(startAmount.replace(/,/g, ''));
-    }
     var monthlyContribution = formatNumber("1000");
-    function getMonthlyContributionValue(): number {
-        return Number(monthlyContribution.replace(/,/g, ''));
-    }
-    const futureYears = 5;
-    var futureMonths = 1 + 12*futureYears; // number of years
+    function getStartAmountValue(): number {return Number(startAmount.replace(/,/g, ''));}
+    function getMonthlyContributionValue(): number {return Number(monthlyContribution.replace(/,/g, ''));}
 
+    const futureYears = 20;
+    var futureMonths = 1 + 12*futureYears; // number of years
     const taxRate = 37.84 / 100;  //https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/aksjer-og-verdipapirer/om/aksjesparekonto-ask/
 
     var showAddFundInput = false;
     var showAddBankInput = false;
 
+    /* data */
+    var fundsData: FundResult[];
+    var banksData: Bank[];
+
+    /* reactive data */
     var funds: FundResult[] = [];
     var banks: Bank[] = [];
     var chart: Chart;
@@ -45,10 +49,6 @@
         
         showAddBankInput = false;
         plotGraph();
-    }
-
-    function formatNumber(value: string): string {
-        return value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
     let inputElement: HTMLInputElement; // focus on input element on load
@@ -122,9 +122,23 @@
                 data: {
                     labels: labels,
                     datasets: [...fundDatasets, ...bankDatasets]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        zoom: {
+                            zoom: {
+                                wheel: { enabled: true },
+                                pinch: { enabled: true },
+                                mode: 'x',
+                            }
+                        }
+                    }
                 }
             }
         );
+
+        chart.zoomScale('x', {min: 0, max: 50}, "zoom");
     } 
 
     onMount(async () => {
@@ -141,8 +155,9 @@
             banksData = await banksResponse.json();
 
             // for testing purposes fill in with 3 funds and 3 banks
-            funds = [fundsData[0]];
-            banks = [banksData.filter(bank => bank.leverandorVisningsnavn.includes('DNB'))[0]];
+            console.log(fundsData[0]);
+            funds = fundsData.filter(x => x.instrument_info.name.toLowerCase().includes('dnb global indeks'));
+            banks = [banksData.filter(bank => bank.leverandorVisningsnavn.toLowerCase().includes('dnb'))[0]];
 
             plotGraph();
         } catch (error) {
@@ -166,20 +181,20 @@
         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5em;width: 20%;">
             <div>
                 <label for="startAmount">Starting Amount:<br></label>
-                <input type="text" id="startAmount" bind:value={startAmount} placeholder="Enter starting amount" on:input={(e) => startAmount = formatNumber(e.currentTarget.value)} />
+                <input type="text" id="startAmount" bind:value={startAmount} placeholder="Enter starting amount" on:input={(e) => {startAmount = formatNumber(e.currentTarget.value); plotGraph();}} />
             </div>
             <div>
                 <label for="monthlyContribution">Monthly Contribution:</label>
-                <input type="text" id="monthlyContribution" bind:value={monthlyContribution} placeholder="Enter monthly contribution" on:input={(e) => monthlyContribution = formatNumber(e.currentTarget.value)} />
+                <input type="text" id="monthlyContribution" bind:value={monthlyContribution} placeholder="Enter monthly contribution" on:input={(e) => {monthlyContribution = formatNumber(e.currentTarget.value); plotGraph();}} />
             </div>
             <br>
             <div style="display: flex; flex-direction: row; gap: 0.5em;">
                 <div style="display: flex; flex-direction: row; gap: 0.5em;">
-                    <button on:click={() => {showAddFundInput = true; showAddBankInput = false;}} class="add-button">
-                        <i class="fas fa-plus-circle"></i> Add Fund
+                    <button style="display: flex; align-items: center; gap: 0.5em;white-space: nowrap;" on:click={() => {showAddFundInput = true; showAddBankInput = false;}} class="add-button">
+                        <AddIcon /> Add Fund
                     </button>
-                    <button on:click={() => {showAddBankInput = true; showAddFundInput = false;}} class="add-button">
-                        <i class="fas fa-plus-circle"></i> Add Bank
+                    <button style="display: flex; align-items: center; gap: 0.5em;white-space: nowrap;" on:click={() => {showAddBankInput = true; showAddFundInput = false;}} class="add-button">
+                        <AddIcon /> Add Bank
                     </button>
                 </div>
             </div>
@@ -207,26 +222,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-<!--     <div style="display: flex; flex-direction: row; gap: 0.5em; width: 100%;">
-        <div style="display: flex; flex-direction: column; gap: 0.5em; width: 10%;">
-            {#each funds as fund}
-                <CardViewer fund={fund} />
-            {/each}
-        </div>
-
-        <canvas style="margin: 0 1rem 0 1rem; align-self: center; display: flex; justify-content: center; align-items: center;" id="chart" ></canvas>
-
-        <div style="display: flex; flex-direction: column; gap: 0.5em; width: 10%;">
-            {#each banks as bank}
-                <CardViewer bank={bank} />
-            {/each}
-        </div>
-    </div> -->
-
 
     {#if funds.length > 0 && banks.length > 0}
         <div style="display: flex; flex-direction: column; gap: 0.5em; width: 100%;">

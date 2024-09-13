@@ -1,5 +1,8 @@
 # My github pages project
 
+if firstTime:
+- npm install
+
 Dev:
 - npm run dev
 
@@ -10,6 +13,8 @@ Deploy:
 # Notes
 ## Picker
 https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.ts
+
+https://icon-sets.iconify.design/
 
 ## TODO
 - finish circle chooser and move it as a component
@@ -32,6 +37,7 @@ https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.t
 - tax rates https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/aksjer-og-verdipapirer/om/aksjesparekonto-ask/
 
 - on mouse over show cards!!!!
+  - https://www.chartjs.org/docs/latest/samples/legend/html.html for on hover
 - header on table freeze infinite scroll
 - make graph easy to zoom
 - show risik
