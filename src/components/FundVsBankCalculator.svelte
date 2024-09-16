@@ -23,6 +23,7 @@
     var showAddFundInput = false;
     var showAddBankInput = false;
 
+
     /* data */
     var fundsData: FundResult[];
     var banksData: Bank[];
@@ -62,7 +63,7 @@
         fundCalculations.push({after_interest_after_fee: getStartAmountValue(), fee: 0, after_tax: getStartAmountValue()});
 
         const fee = fund.fund_info.fund_calculated_fee / (100*12); // this fee is yearly & so is the interest
-        const interest = fund.historical_returns_info.yield_1y / (100*12);
+        const interest = fund.historical_returns_info.yield_5y / (100*12*5);
 
         for (let i = 1; i < futureMonths; i++) 
         {
@@ -115,8 +116,9 @@
             }
         });
 
+        const canvas = document.getElementById('chart') as HTMLCanvasElement;
         chart = new Chart(
-            document.getElementById('chart') as HTMLCanvasElement,
+            canvas,
             {
                 type: 'line',
                 data: {
@@ -125,7 +127,15 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
+                        legend: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '*Fund numbers are after fees and after taxes, see table below for details',
+                            },
+                        },
                         zoom: {
                             zoom: {
                                 wheel: { enabled: true },
@@ -155,9 +165,8 @@
             banksData = await banksResponse.json();
 
             // for testing purposes fill in with 3 funds and 3 banks
-            console.log(fundsData[0]);
             funds = fundsData.filter(x => x.instrument_info.name.toLowerCase().includes('dnb global indeks'));
-            banks = [banksData.filter(bank => bank.leverandorVisningsnavn.toLowerCase().includes('dnb'))[0]];
+            banks = banksData.filter(bank => bank.leverandorVisningsnavn.toLowerCase().includes('dnb'));
 
             plotGraph();
         } catch (error) {
@@ -166,19 +175,27 @@
     });
 </script>
 
-<main style="display: flex; flex-direction: column; align-items: center; height: 100vh; width: 95vw; gap: 0.5em;">
-    <h1 style="display: flex; align-items: center; justify-content: center;">
+<main style="display: flex; flex-direction: column; align-items: center; height: 100vh; width: 95vw;">
+    <h1 class="title">
         <span>Funds</span>
-        <span style="font-size: 5rem; margin: 0 1rem 0 1rem;">VS</span>
+        <span class="vs-text">VS</span>
         <span>Banks</span>
     </h1>
 
-    <div style="display: flex; flex-direction: row;width: 100%;">
-        <div style="display: flex; flex-direction: column; gap: 0.5em;width: 80%;">
-            <canvas id="chart" ></canvas>
-        </div>
+    <div class="chart-container" style="position: relative;">
+        <canvas id="chart" class="custom-canvas"></canvas>
 
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5em;width: 20%;">
+        <div style="position: absolute; top: 70px; left: 80px; display: flex; flex-direction: row; gap: 5px;">
+            <button on:click={() => chart.zoomScale('x', {min: 0, max: 50}, "zoom")} >Reset Zoom</button>
+        </div>
+    </div>
+
+    <br>
+
+    <div style="display: flex; flex-direction: row; align-items: center;width: 100%;">
+        
+
+<!--         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5em;width: 20%;">
             <div>
                 <label for="startAmount">Starting Amount:<br></label>
                 <input type="text" id="startAmount" bind:value={startAmount} placeholder="Enter starting amount" on:input={(e) => {startAmount = formatNumber(e.currentTarget.value); plotGraph();}} />
@@ -220,19 +237,34 @@
                     </div>
                 {/if}
             </div>
+        </div> -->
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 1em;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; flex: 1;">
+            {#each funds as fund}
+                <CardViewer {fund} />
+            {/each}
+        </div>
+        <hr style="align-self: stretch; margin: 0 1em;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; flex: 1;">
+            {#each banks as bank}
+                <CardViewer {bank} />
+            {/each}
         </div>
     </div>
 
     {#if funds.length > 0 && banks.length > 0}
-        <div style="display: flex; flex-direction: column; gap: 0.5em; width: 100%;">
-            <h1 style="text-align: center;">Comparison</h1>
+        <h1 style="text-align: center;">Comparison</h1>
+        <div style="display: flex; flex-direction: column; gap: 0.5em;width: 100%;min-width: 100%; overflow-x: auto; flex: 1 0 100%;">
             <table>
                 <thead>
                     <tr>
                         <th>Date</th>
                         {#each funds as fund}
                             <th colspan="3">
-                                <div title={fund.instrument_info.name} style="display: flex; align-items: center; gap: 5px;">
+                                <div title={fund.instrument_info.name} 
+                                style="display: flex; align-items: center; gap: 5px;">
                                     <img src={fund.instrument_info.instrument_icon_url} alt={fund.instrument_info.name} style="width: 20px; height: 20px;" />
                                     {fund.instrument_info.name}
                                 </div>
@@ -242,7 +274,7 @@
                             <th>
                                 <div title={bank.leverandorVisningsnavn} style="display: flex; align-items: center; gap: 5px;">
                                     <img src={bank.icon_url} alt={bank.leverandorVisningsnavn} style="width: 20px; height: 20px;" />
-                                    {bank.leverandorVisningsnavn}
+                                    {bank.leverandorVisningsnavn + ` (${bank.navn})`}
                                 </div>
                             </th>
                         {/each}
@@ -283,5 +315,35 @@
     {/if}
 </main>
 
-<style>
+<style>    
+    .chart-container {
+        width: 95vw;
+    }
+
+    .custom-canvas {
+        height: 82vh;
+    }
+
+    .title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .vs-text {
+        font-size: 5rem;
+        margin: 0 1rem;
+    }
+
+
+    @media (max-width: 768px) {       
+        .title {
+            font-size: 3rem;
+        }
+
+        .vs-text {
+            font-size: 3rem; /* Adjust as needed */
+        }
+
+    }
 </style>

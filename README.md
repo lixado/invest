@@ -17,6 +17,8 @@ https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.t
 https://icon-sets.iconify.design/
 
 ## TODO
+@xenova/transformers
+
 - finish circle chooser and move it as a component
 - make background based on mouse position & mandelbrot set
 - https://medium.com/@nomanfareed681/parallel-processing-in-javascript-with-concurrency-c214e9facefd
