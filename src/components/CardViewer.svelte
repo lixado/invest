@@ -1,5 +1,7 @@
 <script lang="ts">
 import type { FundResult, Bank } from '../utils/models';
+import AddIcon from "virtual:icons/material-symbols/add";
+import IconoirFileNotFound from 'virtual:icons/iconoir/file-not-found';
 
 export let fund: FundResult | null = null;
 export let bank: Bank | null = null;
@@ -28,7 +30,11 @@ $: cardData = fund
 <main>
     {#if cardData}
         <div class="mat-card">
-            <img src={cardData.iconUrl} alt="" style="width: 50px; height: 50px;" />
+            {#if cardData.iconUrl}
+                <img src={cardData.iconUrl} alt="Icon" style="width: 50px; height: 50px;" on:error={() => {cardData.iconUrl = '';}} />
+            {:else}
+                <IconoirFileNotFound style="width: 50px; height: 50px;"/>
+            {/if}
             <h3>
                 <a href={cardData.url} 
                     target="_blank">

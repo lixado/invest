@@ -132,6 +132,12 @@ input:focus {
   animation: spin 1s linear infinite;
 }
 
+@media (max-width: 768px) {
+  #app {
+    padding: 0 1rem 1rem 1rem;
+  }
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
