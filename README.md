@@ -11,31 +11,19 @@ Deploy:
 - npm run deploy
 
 # Notes
-## Picker
-https://github.com/illumincrotty/Circular-Hue-Color-Picker/blob/main/lib/index.ts
-
+## Icons
 https://icon-sets.iconify.design/
 
-## TODO
-@xenova/transformers
 
-- finish circle chooser and move it as a component
-- make background based on mouse position & mandelbrot set
-- https://medium.com/@nomanfareed681/parallel-processing-in-javascript-with-concurrency-c214e9facefd
-- make juliaFunctions/Worker.ts only load on JuliaSet load
-- Julia set mouse and performance improvements
-- center the VS
-- preload icons
-- mobile friendly
-- auto fix icon url at mount or in the json
+
+## TODO
+
 - fix white mode
 "rentesats1": "0",
 "rentesats2": "4.35",
 - use colors from icon if possible!!
 
 - automate scripts to update data from :!!!!!!!!!!!!!!! and add to publish
-- banks
-- funds
 - tax rates https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/aksjer-og-verdipapirer/om/aksjesparekonto-ask/
 
 - on mouse over show cards!!!!
@@ -60,3 +48,19 @@ add IPS konto
 fix mobile view
 make graph reactive should be 1 line
 dont reset (graph filter) when adding fund on graph
+
+funds add on top
+banks add on push
+for order in legend graph
+on graph hover
+show maybe card info
+but certanctly show total saved + profit
+
+table use default scrolling
+
+sidebar use background color for light mmode
+on change recalculate table for funds
+
+start anount and montly contribution side by side
+
+banks graph name use same name as cards

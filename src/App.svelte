@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { fade } from 'svelte/transition';
+  import { fade } from "svelte/transition";
 
   import { Chart } from "chart.js/auto";
   import zoomPlugin from "chartjs-plugin-zoom";
 
   import IconoirFileNotFound from "virtual:icons/iconoir/file-not-found";
-  import LucideSidebarOpen from 'virtual:icons/lucide/sidebar-open';
+  import LucideSidebarOpen from "virtual:icons/lucide/sidebar-open";
 
   import type { FundResult, Bank, AutocompleteOption } from "./utils/models";
   import CardViewer from "./components/CardViewer.svelte";
@@ -32,24 +32,6 @@
   var funds: FundResult[] = [];
   var banks: Bank[] = [];
   var chart: Chart;
-
-  function addFund(event: CustomEvent) {
-    const option: AutocompleteOption = event.detail.option;
-    funds.push(fundsData[option.index]);
-    funds = funds; // Trigger reactivity
-
-    showAddFundInput = false;
-    plotGraph();
-  }
-
-  function addBank(event: CustomEvent) {
-    const option: AutocompleteOption = event.detail.option;
-    banks.push(banksData[option.index]);
-    banks = banks; // Trigger reactivity
-
-    showAddBankInput = false;
-    plotGraph();
-  }
 
   let inputElement: HTMLInputElement; // focus on input element on load
   $: if (showAddFundInput && inputElement) {
@@ -81,12 +63,9 @@
         after_interest - fee_cost + monthlyContribution;
 
       let profit =
-        after_interest_after_fee -
-        (startAmount + monthlyContribution * i);
+        after_interest_after_fee - (startAmount + monthlyContribution * i);
       let after_tax =
-        startAmount +
-        monthlyContribution * i +
-        profit * (1 - taxRate);
+        startAmount + monthlyContribution * i + profit * (1 - taxRate);
 
       fundCalculations.push({
         after_interest_after_fee: after_interest_after_fee,
@@ -221,9 +200,29 @@
 
 <main>
   {#if sidebarOpen}
-    <SideBar on:resetZoom={e => {chart.resetZoom();}} on:close={toggleSidebar} bind:startAmount={startAmount} bind:monthlyContribution={monthlyContribution} on:change={plotGraph} />
+    <SideBar
+      on:resetZoom={(e) => {
+        chart.resetZoom();
+      }}
+      on:close={toggleSidebar}
+      bind:startAmount
+      bind:monthlyContribution
+      on:change={(e) => {
+        plotGraph();
+      funds = funds;// Trigger reactivity
+      banks = banks;// Trigger reactivity
+      }}
+      bind:fundsData
+      bind:banksData
+      bind:funds
+      bind:banks
+    />
   {:else}
-    <button transition:fade={{ duration: 300 }} class="sidebar-button" on:click={toggleSidebar}><LucideSidebarOpen /></button>
+    <button
+      transition:fade={{ duration: 300 }}
+      class="sidebar-button"
+      on:click={toggleSidebar}><LucideSidebarOpen /></button
+    >
   {/if}
 
   <div
@@ -240,54 +239,6 @@
     </div>
 
     <br />
-
-    <div
-      style="display: flex; flex-direction: row; align-items: center;width: 100%;"
-    >
-      <!--         <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5em;width: 20%;">
-          <div>
-              <label for="startAmount">Starting Amount:<br></label>
-              <input type="text" id="startAmount" bind:value={startAmount} placeholder="Enter starting amount" on:input={(e) => {startAmount = formatNumber(e.currentTarget.value); plotGraph();}} />
-          </div>
-          <div>
-              <label for="monthlyContribution">Monthly Contribution:</label>
-              <input type="text" id="monthlyContribution" bind:value={monthlyContribution} placeholder="Enter monthly contribution" on:input={(e) => {monthlyContribution = formatNumber(e.currentTarget.value); plotGraph();}} />
-          </div>
-          <br>
-          <div style="display: flex; flex-direction: row; gap: 0.5em;">
-              <div style="display: flex; flex-direction: row; gap: 0.5em;">
-                  <button style="display: flex; align-items: center; gap: 0.5em;white-space: nowrap;" on:click={() => {showAddFundInput = true; showAddBankInput = false;}} class="add-button">
-                      <AddIcon /> Add Fund
-                  </button>
-                  <button style="display: flex; align-items: center; gap: 0.5em;white-space: nowrap;" on:click={() => {showAddBankInput = true; showAddFundInput = false;}} class="add-button">
-                      <AddIcon /> Add Bank
-                  </button>
-              </div>
-          </div>
-          <div style="display: flex; flex-direction: row; gap: 0.5em;">
-              {#if showAddFundInput}
-                  <div style="display: flex; align-items: center;">
-                      <AutocompleteSelector options={fundsData.map((fund, index) => ({
-                          index: index,
-                          name: fund.instrument_info.name,
-                          icon_url: fund.instrument_info.instrument_icon_url,
-                          interest_rate: fund.annual_growth_info.annual_growth_1y
-                      }))} on:select={addFund} />
-                  </div>
-              {/if}
-              {#if showAddBankInput}
-                  <div style="display: flex; align-items: center;">
-                      <AutocompleteSelector options={banksData.map((bank, index) => ({
-                          index: index,
-                          name: bank.leverandorVisningsnavn + ` (${bank.navn})`,
-                          icon_url: bank.leverandorUrl.endsWith('/') ? bank.leverandorUrl + 'favicon.ico' : bank.leverandorUrl + '/favicon.ico',
-                          interest_rate: Number(bank.rentesats1)
-                      }))} on:select={addBank} />
-                  </div>
-              {/if}
-          </div>
-      </div> -->
-    </div>
 
     <div
       style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 1em;"
@@ -359,9 +310,9 @@
             <tr>
               <th></th>
               {#each funds as _}
-                <th>After Interest <br /> & after fee</th>
+                <th>After interest &<br /> after fee</th>
                 <th>Fee</th>
-                <th>After Tax</th>
+                <th>After Tax & <br /> after fees</th>
               {/each}
               {#each banks as _}
                 <th></th>
