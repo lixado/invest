@@ -192,7 +192,7 @@
         padding: 1rem;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         border-right: 1px solid #ccc;
-        z-index: 10; /* Add this line to ensure the sidebar appears above other elements */
+        z-index: 1000; /* Add this line to ensure the sidebar appears above other elements */
     }
 
     label {

@@ -15,6 +15,8 @@
 
 	Chart.register(zoomPlugin);
 
+	var IsMobile = window.innerWidth < 768;
+
 	var startAmount = 10000;
 	var monthlyContribution = 1000;
 
@@ -208,7 +210,7 @@
 					zoom: {
 						zoom: {
 							wheel: { enabled: true },
-							pinch: { enabled: true },
+							pinch: { enabled: !IsMobile },
 							drag: { enabled: true },
 							mode: "x",
 						},
@@ -304,9 +306,7 @@
 		>
 	{/if}
 
-	<div
-		style="display: flex; flex-direction: column; align-items: center; height: 100vh; width: 95vw;"
-	>
+	<div class="main-container">
 		<h1 class="title">
 			<span>Funds</span>
 			<span class="vs-text">VS</span>
@@ -478,9 +478,17 @@
 </main>
 
 <style>
+	.main-container {
+		display: flex; 
+		flex-direction: column; 
+		align-items: center; 
+		height: 100vh; 
+		width: 95vw;
+	}
+
 	.sidebar-button {
 		position: fixed;
-		top: 50%;
+		top: 50vh;
 		left: 10px;
 		transform: translateY(-50%);
 		z-index: 1000;
