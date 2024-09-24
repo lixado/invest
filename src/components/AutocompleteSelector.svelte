@@ -97,8 +97,8 @@
         list-style: none; /* Remove default list styling */
         display: flex;
         flex-direction: column;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 10px; /* Start at the left side of the panel with a margin of 10px */
+        max-width: 95vw;
         max-height: 275px; /* Adjust this value based on your item height */
         overflow-y: auto;
     }

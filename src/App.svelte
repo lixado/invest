@@ -29,7 +29,6 @@
 	/* reactive data */
 	var funds: FundResult[] = [];
 	var banks: Bank[] = [];
-	var chart: Chart;
 
 	function calculateFund(
 		fund: FundResult
@@ -77,6 +76,11 @@
 			monthlyContribution
 		);
 	}
+
+  var chart: Chart;
+  var selectedLegendItemIndex: number | null = null;
+  var position: {x: number, y: number} | null = null;
+  var timeout: NodeJS.Timeout | null = null;
 
 	function plotGraph() {
 		if (chart) chart.destroy();
@@ -144,7 +148,17 @@
 						title: {
 							display: true,
 							text: '*Fund numbers are after fees and after taxes, see table below for details'
-						}
+						},
+            onHover: function (event, legendItem, legend) {
+              if (timeout) clearTimeout(timeout);
+              selectedLegendItemIndex = legendItem.datasetIndex ?? null;
+              selectedLegendItemIndex = legendItem.datasetIndex ?? null;
+              position = event.x != null && event.y != null ? {x: event.x, y: event.y} : null;
+              timeout = setTimeout(() => {
+                selectedLegendItemIndex = null;
+                position = null;
+              }, 2300);
+            }
 					},
 					zoom: {
 						zoom: {
@@ -201,6 +215,16 @@
 </script>
 
 <main>
+  {#if selectedLegendItemIndex !== null && position !== null}
+    <div style="position: absolute; top: {200+position.y}px; left: {position.x}px;z-index: 1000;">
+      {#if selectedLegendItemIndex >= funds.length}
+        <CardViewer bank={banks[selectedLegendItemIndex - funds.length]} />
+      {:else}
+        <CardViewer fund={funds[selectedLegendItemIndex]} />
+      {/if}
+    </div>
+  {/if}
+  
 	{#if sidebarOpen}
 		<SideBar
 			on:resetZoom={(e) => {
