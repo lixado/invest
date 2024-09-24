@@ -52,7 +52,7 @@
 		});
 
 		const fee = fund.fund_info.fund_calculated_fee / (100 * 12); // this fee is yearly & so is the interest
-		const interest = fund.historical_returns_info.yield_5y / (100 * 12 * 5);
+		const interest = fund.historical_returns_info.yield_5y ? fund.historical_returns_info.yield_5y / (100 * 12 * 5) : fund.historical_returns_info.yield_1y / (100 * 12 * 1);
 
 		for (let i = 1; i < futureMonths; i++) {
 			let after_interest =
