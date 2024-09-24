@@ -54,13 +54,3 @@ banks add on push
 for order in legend graph
 on graph hover
 show maybe card info
-but certanctly show total saved + profit
-
-table use default scrolling
-
-sidebar use background color for light mmode
-on change recalculate table for funds
-
-start anount and montly contribution side by side
-
-banks graph name use same name as cards
