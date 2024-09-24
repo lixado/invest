@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { onMount } from "svelte";
+	import { fade } from "svelte/transition";
 
-	import { Chart } from 'chart.js/auto';
-	import zoomPlugin from 'chartjs-plugin-zoom';
+	import { Chart } from "chart.js/auto";
+	import zoomPlugin from "chartjs-plugin-zoom";
 
-	import IconoirFileNotFound from 'virtual:icons/iconoir/file-not-found';
-	import LucideSidebarOpen from 'virtual:icons/lucide/sidebar-open';
+	import IconoirFileNotFound from "virtual:icons/iconoir/file-not-found";
+	import LucideSidebarOpen from "virtual:icons/lucide/sidebar-open";
 
-	import type { FundResult, Bank, AutocompleteOption } from './utils/models';
-	import CardViewer from './components/CardViewer.svelte';
-	import SideBar from './components/SideBar.svelte';
-	import { formatCurrency } from './utils/utils';
+	import type { FundResult, Bank, AutocompleteOption } from "./utils/models";
+	import CardViewer from "./components/CardViewer.svelte";
+	import SideBar from "./components/SideBar.svelte";
+	import { formatCurrency } from "./utils/utils";
 
 	Chart.register(zoomPlugin);
 
@@ -31,34 +31,49 @@
 	var banks: Bank[] = [];
 
 	function calculateFund(
-		fund: FundResult
-	): { after_interest_after_fee: number; fee: number; after_tax: number }[] {
+		fund: FundResult,
+	): {
+		after_interest_after_fee: number;
+		fee: number;
+		tax: number;
+		after_tax: number;
+	}[] {
 		let fundCalculations: {
 			after_interest_after_fee: number;
 			fee: number;
+			tax: number;
 			after_tax: number;
 		}[] = [];
 		fundCalculations.push({
 			after_interest_after_fee: startAmount,
 			fee: 0,
-			after_tax: startAmount
+			tax: 0,
+			after_tax: startAmount,
 		});
 
 		const fee = fund.fund_info.fund_calculated_fee / (100 * 12); // this fee is yearly & so is the interest
 		const interest = fund.historical_returns_info.yield_5y / (100 * 12 * 5);
 
 		for (let i = 1; i < futureMonths; i++) {
-			let after_interest = fundCalculations[i - 1].after_interest_after_fee * (1 + interest);
+			let after_interest =
+				fundCalculations[i - 1].after_interest_after_fee *
+				(1 + interest);
 			let fee_cost = after_interest * fee;
-			let after_interest_after_fee = after_interest - fee_cost + monthlyContribution;
+			let after_interest_after_fee =
+				after_interest - fee_cost + monthlyContribution;
 
-			let profit = after_interest_after_fee - (startAmount + monthlyContribution * i);
-			let after_tax = startAmount + monthlyContribution * i + profit * (1 - taxRate);
+			let profit =
+				after_interest_after_fee -
+				(startAmount + monthlyContribution * i);
+			let tax = profit * taxRate;
+			let after_tax =
+				startAmount + monthlyContribution * i + (profit - tax);
 
 			fundCalculations.push({
 				after_interest_after_fee: after_interest_after_fee,
 				fee: fee_cost,
-				after_tax: after_tax
+				tax: tax,
+				after_tax: after_tax,
 			});
 		}
 
@@ -72,15 +87,15 @@
 		}
 		// recursive calculation of the bank's interest
 		return (
-			calculateBank(bank, months - 1) * (1 + Number(bank.rentesats1) / (100 * 12)) +
+			calculateBank(bank, months - 1) *
+				(1 + Number(bank.rentesats1) / (100 * 12)) +
 			monthlyContribution
 		);
 	}
 
-  var chart: Chart;
-  var selectedLegendItemIndex: number | null = null;
-  var position: {x: number, y: number} | null = null;
-  var timeout: NodeJS.Timeout | null = null;
+	var chart: Chart;
+	var selectedLegendItemIndex: number | null = null;
+	var position: { x: number; y: number } | null = null;
 
 	function plotGraph() {
 		if (chart) chart.destroy();
@@ -88,9 +103,9 @@
 		const labels = Array.from({ length: futureMonths }, (_, i) => {
 			const date = new Date();
 			date.setMonth(date.getMonth() + i);
-			return date.toLocaleDateString('en-GB', {
-				month: 'short',
-				year: 'numeric'
+			return date.toLocaleDateString("en-GB", {
+				month: "short",
+				year: "numeric",
 			});
 		});
 
@@ -99,79 +114,110 @@
 				label: fund.instrument_info.name,
 				data: calculateFund(fund).map((calc) => calc.after_tax),
 				fill: false,
-				tension: 0.1
+				tension: 0.1,
 			};
 		});
 
 		const bankDatasets = banks.map((bank) => {
 			return {
-				label: bank.leverandorVisningsnavn,
-				data: Array.from({ length: futureMonths }, (_, i) => calculateBank(bank, i)),
+				label: bank.leverandorVisningsnavn + ` (${bank.navn})`,
+				data: Array.from({ length: futureMonths }, (_, i) =>
+					calculateBank(bank, i),
+				),
 				fill: false,
-				tension: 0.1
+				tension: 0.1,
 			};
 		});
 
-		const canvas = document.getElementById('chart') as HTMLCanvasElement;
+		const canvas = document.getElementById("chart") as HTMLCanvasElement;
 		chart = new Chart(canvas, {
-			type: 'line',
+			type: "line",
 			data: {
 				labels: labels,
-				datasets: [...fundDatasets, ...bankDatasets]
+				datasets: [...fundDatasets, ...bankDatasets],
 			},
 			options: {
 				responsive: true,
 				maintainAspectRatio: false,
+				interaction: {
+					mode: 'nearest',
+					axis: 'x',
+					intersect: false,
+				},
 				plugins: {
 					tooltip: {
 						callbacks: {
 							label: function (context) {
-								let label = context.dataset.label || '';
+								let label = context.dataset.label || "";
 
 								if (label) {
-									label += ': ';
+									label += ": ";
 								}
 								if (context.parsed.y !== null) {
 									label += formatCurrency(context.parsed.y);
 								}
 
-                const monthCount = context.parsed.x;
-                const totalSaved = monthCount * monthlyContribution + startAmount;
-                const profit = context.parsed.y - totalSaved;
+								const monthCount = context.parsed.x;
+								const totalSaved =
+									monthCount * monthlyContribution +
+									startAmount;
+								const profit = context.parsed.y - totalSaved;
 
-								return [label, `Saved: ${formatCurrency(totalSaved)}`, `Profit:   ${formatCurrency(profit)}`];
-							}
+								return [
+									label,
+									`Saved: ${formatCurrency(totalSaved)}`,
+									`Profit:   ${formatCurrency(profit)}`,
+								];
+							},
 						},
 					},
 					legend: {
 						display: true, // show legend
 						title: {
 							display: true,
-							text: '*Fund numbers are after fees and after taxes, see table below for details'
+							text: "*Fund numbers are after fees and after taxes, see table below for details",
 						},
-            onHover: function (event, legendItem, legend) {
-              if (timeout) clearTimeout(timeout);
-              selectedLegendItemIndex = legendItem.datasetIndex ?? null;
-              selectedLegendItemIndex = legendItem.datasetIndex ?? null;
-              position = event.x != null && event.y != null ? {x: event.x, y: event.y} : null;
-              timeout = setTimeout(() => {
-                selectedLegendItemIndex = null;
-                position = null;
-              }, 2300);
-            }
+						onClick(e, legendItem, legend) {
+							console.log(legendItem.datasetIndex);
+							if (legendItem.datasetIndex === undefined) return;
+
+							if (legendItem.datasetIndex >= funds.length) 
+							{
+								banks = banks.filter((_, index) => index !== legendItem.datasetIndex);
+								plotGraph();
+							}else{
+								funds = funds.filter((_, index) => index !== legendItem.datasetIndex);
+								plotGraph();
+							}
+						},
+						onHover: function (event, legendItem, legend) {
+							selectedLegendItemIndex =
+								legendItem.datasetIndex ?? null;
+							selectedLegendItemIndex =
+								legendItem.datasetIndex ?? null;
+							position =
+								event.x != null && event.y != null
+									? { x: event.x, y: event.y }
+									: null;
+						},
+						onLeave: function (event, legendItem, legend) {
+							selectedLegendItemIndex = null;
+							position = null;
+						},
 					},
 					zoom: {
 						zoom: {
 							wheel: { enabled: true },
 							pinch: { enabled: true },
-							mode: 'x'
-						}
-					}
-				}
-			}
+							drag: { enabled: true },
+							mode: "x",
+						},
+					},
+				},
+			},
 		});
 
-		chart.zoomScale('x', { min: 0, max: 50 }, 'zoom');
+		chart.zoomScale("x", { min: 0, max: 50 }, "zoom");
 	}
 
 	var sidebarOpen: boolean = false;
@@ -185,46 +231,53 @@
 			const currentUrl = window.location.href;
 
 			// Read JSON from funds.json
-			const fundsResponse = await fetch(currentUrl + '/funds.json');
+			const fundsResponse = await fetch(currentUrl + "/funds.json");
 			fundsData = await fundsResponse.json();
 
 			// Read JSON from banks.json
-			const banksResponse = await fetch(currentUrl + '/banks.json');
+			const banksResponse = await fetch(currentUrl + "/banks.json");
 			banksData = await banksResponse.json();
 
 			// Get up to 3 funds
 			funds = fundsData
 				.filter(
 					(x) =>
-						x.instrument_info.name.toLowerCase() == 'DNB Global Indeks A'.toLocaleLowerCase() ||
-						x.instrument_info.name.toLowerCase() == 'KLP AksjeNorge Aktiv P'.toLocaleLowerCase() ||
 						x.instrument_info.name.toLowerCase() ==
-							'KLP AksjeUSA Indeks Valutasikret P'.toLocaleLowerCase()
+							"DNB Global Indeks A".toLocaleLowerCase() ||
+						x.instrument_info.name.toLowerCase() ==
+							"KLP AksjeUSA Indeks Valutasikret P".toLocaleLowerCase(),
 				)
 				.slice(0, 3);
 
 			banks = banksData
-				.filter((bank) => bank.leverandorVisningsnavn.toLowerCase().includes('dnb'))
-				.slice(0, 3);
+				.filter((bank) =>
+					bank.leverandorVisningsnavn.toLowerCase().includes("dnb"),
+				)
+				.slice(0, 2);
 
 			plotGraph();
 		} catch (error) {
-			console.error('Error fetching stock price data:', error);
+			console.error("Error fetching stock price data:", error);
 		}
 	});
 </script>
 
 <main>
-  {#if selectedLegendItemIndex !== null && position !== null}
-    <div style="position: absolute; top: {200+position.y}px; left: {position.x}px;z-index: 1000;">
-      {#if selectedLegendItemIndex >= funds.length}
-        <CardViewer bank={banks[selectedLegendItemIndex - funds.length]} />
-      {:else}
-        <CardViewer fund={funds[selectedLegendItemIndex]} />
-      {/if}
-    </div>
-  {/if}
-  
+	{#if selectedLegendItemIndex !== null && position !== null}
+		<div
+			style="position: absolute; top: {200 +
+				position.y}px; left: {position.x}px;z-index: 1000;"
+		>
+			{#if selectedLegendItemIndex >= funds.length}
+				<CardViewer
+					bank={banks[selectedLegendItemIndex - funds.length]}
+				/>
+			{:else}
+				<CardViewer fund={funds[selectedLegendItemIndex]} />
+			{/if}
+		</div>
+	{/if}
+
 	{#if sidebarOpen}
 		<SideBar
 			on:resetZoom={(e) => {
@@ -244,8 +297,10 @@
 			bind:banks
 		/>
 	{:else}
-		<button transition:fade={{ duration: 300 }} class="sidebar-button" on:click={toggleSidebar}
-			><LucideSidebarOpen /></button
+		<button
+			transition:fade={{ duration: 300 }}
+			class="sidebar-button"
+			on:click={toggleSidebar}><LucideSidebarOpen /></button
 		>
 	{/if}
 
@@ -264,14 +319,20 @@
 
 		<br />
 
-		<div style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 1em;">
-			<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; flex: 1;">
+		<div
+			style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%; gap: 1em;"
+		>
+			<div
+				style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; flex: 1;"
+			>
 				{#each funds as fund}
 					<CardViewer {fund} />
 				{/each}
 			</div>
 			<hr style="align-self: stretch; margin: 0 1em;" />
-			<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; flex: 1;">
+			<div
+				style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; flex: 1;"
+			>
 				{#each banks as bank}
 					<CardViewer {bank} />
 				{/each}
@@ -280,21 +341,21 @@
 
 		{#if funds.length > 0 && banks.length > 0}
 			<h1 style="text-align: center;">Comparison</h1>
-			<div
-				style="display: flex; flex-direction: column; gap: 0.5em;width: 100%;min-width: 100%; overflow-x: auto; flex: 1 0 100%;"
-			>
-				<table>
+
+			<div class="table-container">
+				<table style="max-width: fit-content;">
 					<thead>
 						<tr>
-							<th>Date</th>
+							<th class="sticky-header">Date</th>
 							{#each funds as fund}
-								<th colspan="3">
+								<th colspan="4" class="sticky-header">
 									<div
 										title={fund.instrument_info.name}
 										style="display: flex; align-items: center; gap: 5px;"
 									>
 										<img
-											src={fund.instrument_info.instrument_icon_url}
+											src={fund.instrument_info
+												.instrument_icon_url}
 											alt={fund.instrument_info.name}
 											style="width: 20px; height: 20px;"
 										/>
@@ -303,7 +364,7 @@
 								</th>
 							{/each}
 							{#each banks as bank}
-								<th>
+								<th class="sticky-header">
 									<div
 										title={bank.leverandorVisningsnavn}
 										style="display: flex; align-items: center; gap: 5px;"
@@ -314,26 +375,30 @@
 												alt={bank.leverandorVisningsnavn}
 												style="width: 20px; height: 20px;"
 												on:error={() => {
-													bank.icon_url = '';
+													bank.icon_url = "";
 												}}
 											/>
 										{:else}
-											<IconoirFileNotFound style="width: 20px; height: 20px;" />
+											<IconoirFileNotFound
+												style="width: 20px; height: 20px;"
+											/>
 										{/if}
-										{bank.leverandorVisningsnavn + ` (${bank.navn})`}
+										{bank.leverandorVisningsnavn +
+											` (${bank.navn})`}
 									</div>
 								</th>
 							{/each}
 						</tr>
 						<tr>
-							<th></th>
+							<th class="sticky-header-2"></th>
 							{#each funds as _}
-								<th>After interest &<br /> after fee</th>
-								<th>Fee</th>
-								<th>After Tax & <br /> after fees</th>
+								<th class="sticky-header-2">After interest &<br /> after fee</th>
+								<th class="sticky-header-2">Fee</th>
+								<th class="sticky-header-2">Tax</th>
+								<th class="sticky-header-2">After Tax & <br /> after fees</th>
 							{/each}
 							{#each banks as _}
-								<th></th>
+								<th class="sticky-header-2"></th>
 							{/each}
 						</tr>
 					</thead>
@@ -348,38 +413,58 @@
 							<tr>
 								<td
 									>{date
-										.toLocaleDateString('en-GB', {
-											day: '2-digit',
-											month: 'short',
-											year: 'numeric'
+										.toLocaleDateString("en-GB", {
+											day: "2-digit",
+											month: "short",
+											year: "numeric",
 										})
-										.replace(/ /g, ' ')}
+										.replace(/ /g, " ")}
 								</td>
-								{#each funds.map((fund) => calculateFund(fund)) as fundCalculation}
+								{#each funds.map( (fund) => calculateFund(fund), ) as fundCalculation}
 									<td>
-										{fundCalculation[index].after_interest_after_fee.toLocaleString('en-US', {
+										{fundCalculation[
+											index
+										].after_interest_after_fee.toLocaleString(
+											"en-US",
+											{
+												minimumFractionDigits: 2,
+												maximumFractionDigits: 2,
+											},
+										)}
+									</td>
+									<td>
+										{fundCalculation[
+											index
+										].fee.toLocaleString("en-US", {
 											minimumFractionDigits: 2,
-											maximumFractionDigits: 2
+											maximumFractionDigits: 2,
 										})}
 									</td>
 									<td>
-										{fundCalculation[index].fee.toLocaleString('en-US', {
+										{fundCalculation[
+											index
+										].tax.toLocaleString("en-US", {
 											minimumFractionDigits: 2,
-											maximumFractionDigits: 2
+											maximumFractionDigits: 2,
 										})}
 									</td>
 									<td>
-										{fundCalculation[index].after_tax.toLocaleString('en-US', {
+										{fundCalculation[
+											index
+										].after_tax.toLocaleString("en-US", {
 											minimumFractionDigits: 2,
-											maximumFractionDigits: 2
+											maximumFractionDigits: 2,
 										})}
 									</td>
 								{/each}
 								{#each banks as bank}
 									<td>
-										{calculateBank(bank, index).toLocaleString('en-US', {
+										{calculateBank(
+											bank,
+											index,
+										).toLocaleString("en-US", {
 											minimumFractionDigits: 2,
-											maximumFractionDigits: 2
+											maximumFractionDigits: 2,
 										})}
 									</td>
 								{/each}
@@ -431,5 +516,32 @@
 		.vs-text {
 			font-size: 3rem; /* Adjust as needed */
 		}
+	}
+
+	.table-container {
+		max-height: 70vh;
+		position: relative;
+	}
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	.sticky-header {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+	}
+
+	.sticky-header-2 {
+		position: sticky;
+		top: 39px;
+		z-index: 10;
+	}
+
+	th, td {
+		padding: 8px;
+		text-align: left;
 	}
 </style>

@@ -29,3 +29,7 @@ https://icon-sets.iconify.design/
 - add IPS konto
 - bsu
 - fix logos that cant be loaded on data
+
+- breakpoint on date
+
+- freeze table headers
