@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm version patch && vite build",
     "preview": "vite preview",
     "deploy": "npx gh-pages -d dist",
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
