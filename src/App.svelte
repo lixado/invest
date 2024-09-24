@@ -7,6 +7,7 @@
 
 	import IconoirFileNotFound from "virtual:icons/iconoir/file-not-found";
 	import LucideSidebarOpen from "virtual:icons/lucide/sidebar-open";
+	import HelpIcon from "virtual:icons/lucide/help-circle";
 
 	import type { FundResult, Bank, AutocompleteOption } from "./utils/models";
 	import CardViewer from "./components/CardViewer.svelte";
@@ -193,6 +194,8 @@
 							}
 						},
 						onHover: function (event, legendItem, legend) {
+							if(IsMobile) return;
+
 							selectedLegendItemIndex =
 								legendItem.datasetIndex ?? null;
 							selectedLegendItemIndex =
@@ -283,7 +286,7 @@
 	{#if sidebarOpen}
 		<SideBar
 			on:resetZoom={(e) => {
-				chart.resetZoom();
+				chart.zoomScale("x", { min: 0, max: 50 }, "zoom");
 			}}
 			on:close={toggleSidebar}
 			bind:startAmount
@@ -394,7 +397,9 @@
 							{#each funds as _}
 								<th class="sticky-header-2">After interest &<br /> after fee</th>
 								<th class="sticky-header-2">Fee</th>
-								<th class="sticky-header-2">Tax</th>
+								<th title="Tax is calculated as 37.84% of the profit, click on the icon to learn more" class="sticky-header-2">Tax 
+									<a href="https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/aksjer-og-verdipapirer/om/aksjesparekonto-ask/" target="_blank"><HelpIcon /></a>
+								</th>
 								<th class="sticky-header-2">After Tax & <br /> after fees</th>
 							{/each}
 							{#each banks as _}
@@ -477,6 +482,12 @@
 	</div>
 </main>
 
+<svelte:window on:scroll={(e) => {
+	if (window.scrollY > 0) {
+		sidebarOpen = false;
+	}
+}}/>
+
 <style>
 	.main-container {
 		display: flex; 
@@ -516,16 +527,6 @@
 		margin: 0 1rem;
 	}
 
-	@media (max-width: 768px) {
-		.title {
-			font-size: 3rem;
-		}
-
-		.vs-text {
-			font-size: 3rem; /* Adjust as needed */
-		}
-	}
-
 	.table-container {
 		max-height: 70vh;
 		position: relative;
@@ -551,5 +552,15 @@
 	th, td {
 		padding: 8px;
 		text-align: left;
+	}
+
+	@media (max-width: 768px) {
+		.title {
+			font-size: 3rem;
+		}
+
+		.vs-text {
+			font-size: 3rem; /* Adjust as needed */
+		}
 	}
 </style>

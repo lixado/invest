@@ -19,9 +19,7 @@
     export let banks: Bank[] = [];
 
     let startAmountInput: string = formatNumber(startAmount.toString());
-    let monthlyContributionInput: string = formatNumber(
-        monthlyContribution.toString(),
-    );
+    let monthlyContributionInput: string = formatNumber(monthlyContribution.toString());
 
     var showAddFundInput = false;
     var showAddBankInput = false;
@@ -170,11 +168,12 @@
 <style>
     .close-button {
         position: absolute;
-        top: 50%;
+        top: 50vh;
         right: -75px; /* Adjust this value to position the button outside the sidebar */
         transform: translateY(-50%);
         z-index: 1000;
     }
+
     .sidebar-content {
         display: flex;
         gap: 1em;
@@ -203,5 +202,11 @@
     input {
         width: 100%;
         padding: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar-content {
+            
+        }
     }
 </style>
