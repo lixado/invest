@@ -9,7 +9,7 @@
 	import LucideSidebarOpen from "virtual:icons/lucide/sidebar-open";
 	import HelpIcon from "virtual:icons/lucide/help-circle";
 
-	import type { FundResult, Bank, AutocompleteOption } from "./utils/models";
+	import type { FundResult, Bank } from "./utils/models";
 	import CardViewer from "./components/CardViewer.svelte";
 	import SideBar from "./components/SideBar.svelte";
 	import { formatCurrency } from "./utils/utils";

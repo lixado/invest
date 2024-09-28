@@ -179,7 +179,7 @@
         gap: 1em;
         flex-direction: column;
         justify-content: center;
-        height: 100%;
+        height: 100%;       
     }
 
     .sidebar {
@@ -206,7 +206,7 @@
 
     @media (max-width: 768px) {
         .sidebar-content {
-            
+            transform: translateY(-25%);
         }
     }
 </style>
