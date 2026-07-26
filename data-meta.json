@@ -1,0 +1,9 @@
+{
+  "updatedAt": "2026-07-26T07:54:08.907715+00:00",
+  "fundsCount": 900,
+  "fundsSource": "nordnet.no/fond/liste (SSR scrape)",
+  "banksCount": 580,
+  "banksSource": "finans-api.forbrukerradet.no/bankprodukt/bankinnskudd",
+  "historyCount": 2,
+  "historySource": "nordnet market-data v3 (Selenium)"
+}
