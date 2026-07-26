@@ -1,31 +1,51 @@
 # My investment calculator
 
-if firstTime:
-- npm install
+Funds vs banks projection calculator (Svelte + Vite).
 
-Dev:
-- npm run dev
+## Setup
 
-Deploy:
-- npm run build
-- npm run deploy
+```bash
+npm install
+```
 
-# Notes
-## Icons
-https://icon-sets.iconify.design/
+## Dev
 
+```bash
+npm run dev
+```
 
+## Refresh market data (no API keys)
 
-## TODO
+```bash
+npm run update:data
+# or separately:
+npm run update:funds     # Nordnet fund list SSR pages
+npm run update:banks     # Forbrukerrådet bankinnskudd JSON
+npm run update:history   # Nordnet price history for default funds (needs Chrome + selenium)
+```
 
-- fix calculation:
-  "rentesats1": "0",
-  "rentesats2": "4.35",
-- use colors from icon if possible!!
-- automate scripts to update data from :!!!!!!!!!!!!!!! and add to publish
-- tax rates api call? https://www.skatteetaten.no/person/skatt/hjelp-til-riktig-skatt/aksjer-og-verdipapirer/om/aksjesparekonto-ask/
-- on mouse over show cards!!!!
-- https://www.chartjs.org/docs/latest/samples/legend/html.html for on hover
-- add IPS konto
-- bsu
-- fix logos that cant be loaded on data
+History files land in `public/history/{orderBookId}.json`. For every fund:
+
+```bash
+npm run update:history:all
+```
+
+Optional favicon pass for banks:
+
+```bash
+python scripts/fix_icon_urls.py
+```
+
+## Deploy
+
+```bash
+npm run build
+npm run deploy
+```
+
+## Notes
+
+- Icons: https://icon-sets.iconify.design/
+- The chart is a **historical backtest**: pick a start date, apply monthly contributions on real Nordnet return paths (ups and downs).
+- Fund values subtract fees and an illustrative ASK tax (37.84% of profit).
+- Banks use today’s `rentesats1` compounded over the same dates (dashed lines).

@@ -10,6 +10,34 @@ interface FundResult {
 interface InstrumentInfo {
     name: string;
     instrument_icon_url: string;
+    instrument_id?: number;
+    isin?: string;
+    market_data_order_book_id?: string;
+    display_slug?: string;
+    market_identifier?: string;
+}
+
+interface HistoryPoint {
+    t: number; // unix ms
+    v: number; // cumulative return % from series start
+}
+
+interface FundHistory {
+    id: string;
+    name: string;
+    period?: string;
+    resolution?: string;
+    updatedAt?: string;
+    points: HistoryPoint[];
+}
+
+interface BacktestPoint {
+    date: Date;
+    value: number;
+    contributed: number;
+    fee: number;
+    tax: number;
+    afterTax: number;
 }
 
 interface PriceInfo {
@@ -121,4 +149,17 @@ interface AutocompleteOption {
     interest_rate: number;
 }
 
-export type { AutocompleteOption, Bank, FundResult, InstrumentInfo, PriceInfo, HistoricalReturnsInfo, FundInfo, AnnualGrowthInfo, StatisticalInfo };
+export type {
+    AutocompleteOption,
+    Bank,
+    FundResult,
+    InstrumentInfo,
+    PriceInfo,
+    HistoricalReturnsInfo,
+    FundInfo,
+    AnnualGrowthInfo,
+    StatisticalInfo,
+    HistoryPoint,
+    FundHistory,
+    BacktestPoint,
+};

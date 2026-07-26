@@ -8,7 +8,12 @@
     "build": "npm version patch && vite build",
     "preview": "vite preview",
     "deploy": "npx gh-pages -d dist",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "update:funds": "python scripts/update_funds.py",
+    "update:banks": "python scripts/update_banks.py",
+    "update:history": "python scripts/update_history.py --mode defaults",
+    "update:history:all": "python scripts/update_history.py --mode all",
+    "update:data": "python scripts/update_funds.py && python scripts/update_banks.py && python scripts/update_history.py --mode defaults"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
